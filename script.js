@@ -111,29 +111,29 @@ function extractFieldFlexible(text, fieldName) {
         if (qm) return qm[1];
     }
 
-    // if (fieldName === 'deviceId') {
-    //     // deviceId: Look for 40 hex chars (but not part of bioId)
-    //     // Find all 40-char hex strings
-    //     const deviceIdPattern = /\b([0-9a-fA-F]{40})\b/g;
-    //     let match;
-    //     const candidates = [];
-    //     while ((match = deviceIdPattern.exec(text)) !== null) {
-    //         candidates.push(match[1]);
-    //     }
+    if (fieldName === 'deviceId') {
+        // deviceId: Look for 40 hex chars (but not part of bioId)
+        // Find all 40-char hex strings
+        const deviceIdPattern = /\b([0-9a-fA-F]{40})\b/g;
+        let match;
+        const candidates = [];
+        while ((match = deviceIdPattern.exec(text)) !== null) {
+            candidates.push(match[1]);
+        }
 
-    //     // If we found a bioId, exclude the deviceId that's part of it
-    //     const bioIdValue = extractFieldFlexible(text, 'bioId');
-    //     if (bioIdValue && bioIdValue.includes('_')) {
-    //         const bioIdDeviceId = extractDeviceIdFromBioId(bioIdValue);
-    //         // Return a deviceId that's different from bioId's deviceId, or the same one if only one exists
-    //         const others = candidates.filter(c => c.toLowerCase() !== bioIdDeviceId?.toLowerCase());
-    //         if (others.length > 0) return others[0];
-    //         if (bioIdDeviceId) return bioIdDeviceId;
-    //     }
+        // // If we found a bioId, exclude the deviceId that's part of it
+        // const bioIdValue = extractFieldFlexible(text, 'bioId');
+        // if (bioIdValue && bioIdValue.includes('_')) {
+        //     const bioIdDeviceId = extractDeviceIdFromBioId(bioIdValue);
+        //     // Return a deviceId that's different from bioId's deviceId, or the same one if only one exists
+        //     const others = candidates.filter(c => c.toLowerCase() !== bioIdDeviceId?.toLowerCase());
+        //     if (others.length > 0) return others[0];
+        //     if (bioIdDeviceId) return bioIdDeviceId;
+        // }
 
-    //     // No bioId found, return first 40-char hex
-    //     if (candidates.length > 0) return candidates[0];
-    // }
+        // No bioId found, return first 40-char hex
+        if (candidates.length > 0) return candidates[0];
+    }
 
     return null;
 }
