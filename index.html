@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eKYC Ticket Validator - DigiBank</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 eKYC Ticket Validator</h1>
+            <p>Kiểm tra và chuẩn hóa ticket trước khi gửi cho team kỹ thuật</p>
+        </div>
+
+        <div class="main-card">
+            <div class="card-header">
+                <h2>📋 Nhập thông tin ticket từ Odoo</h2>
+                <p>Copy/paste Description từ Odoo Helpdesk vào đây</p>
+            </div>
+
+            <div class="card-body">
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="ticket-description">Description (paste log/data vào đây):</label>
+                        <textarea id="ticket-description"
+                            placeholder="Paste toàn bộ log/description từ Odoo vào đây...&#10;&#10;Hỗ trợ nhiều format:&#10;- Standard: bioId: abc123&#10;- JSON: {&quot;bioId&quot;: &quot;abc123&quot;}&#10;- Swift/iOS: AnyHashable(&quot;bioId&quot;): abc123&#10;- Portal link: portal2.digibank.vn/.../bio-id/abc123/..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="validateTicket()">
+                            <span>🔍</span> Kiểm tra & Extract
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearForm()">
+                            <span>🗑️</span> Xóa hết
+                        </button>
+                    </div>
+                </div>
+
+                <div id="results" class="results-section">
+                    <!-- Results will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
