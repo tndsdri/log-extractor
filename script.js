@@ -12,7 +12,6 @@ const VALIDATION_RULES = {
         'Session_ID': 'sessionId',
         'session_id': 'sessionId',
         'session-id': 'sessionId',
-        'sessionID': 'sessionId',
         'DeviceID': 'deviceId',
         'Device_ID': 'deviceId',
         'Device_Id': 'deviceId',
@@ -66,6 +65,77 @@ function extractBioIdFromPortalLink(text) {
     const pattern = /portal2\.digibank\.vn\/onboarding\/bio-id\/([^\/\s]+)/i;
     const match = text.match(pattern);
     return match ? match[1].trim() : null;
+}
+
+function extractFieldFlexible(text, fieldName) {
+    // First try exact extraction
+    let value = extractField(text, fieldName);
+    if (value) return value;
+
+    // Fallback: Try flexible patterns based on expected format
+
+    if (fieldName === 'bioId') {
+        // bioId: Look for UUID_SHA1_timestamp pattern (91 chars)
+        // Pattern: 8-4-4-4-12_40hex_13digits
+        const bioIdPattern = /\b([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}_[0-9a-fA-F]{40}_\d{13})\b/;
+        const match = text.match(bioIdPattern);
+        if (match) return match[1];
+
+        // Also try common field names (case-insensitive)
+        const flexPatterns = [
+            /BIO_ID\s*[:\s]+([^\s,\n]+)/i,
+            /bioId\s*[:\s]+([^\s,\n]+)/i,
+            /bio_id\s*[:\s]+([^\s,\n]+)/i,
+            /bio-id\s*[:\s]+([^\s,\n]+)/i
+        ];
+        for (const pattern of flexPatterns) {
+            const m = text.match(pattern);
+            if (m) {
+                let val = m[1].trim();
+                val = val.replace(/[,;}\]<]+.*$/, '').trim();
+                // Validate it looks like bioId (has underscores and reasonable length)
+                if (val.includes('_') && val.length > 50) return val;
+            }
+        }
+    }
+
+    if (fieldName === 'sessionId') {
+        // sessionId: Look for 64 hex chars
+        const sessionIdPattern = /\b([0-9a-fA-F]{64})\b/;
+        const match = text.match(sessionIdPattern);
+        if (match) return match[1];
+
+        // Also try with quotes or field name
+        const quotedPattern = /"sessionId"\s*[:\s]+"([0-9a-fA-F]{64})"/i;
+        const qm = text.match(quotedPattern);
+        if (qm) return qm[1];
+    }
+
+    // if (fieldName === 'deviceId') {
+    //     // deviceId: Look for 40 hex chars (but not part of bioId)
+    //     // Find all 40-char hex strings
+    //     const deviceIdPattern = /\b([0-9a-fA-F]{40})\b/g;
+    //     let match;
+    //     const candidates = [];
+    //     while ((match = deviceIdPattern.exec(text)) !== null) {
+    //         candidates.push(match[1]);
+    //     }
+
+    //     // If we found a bioId, exclude the deviceId that's part of it
+    //     const bioIdValue = extractFieldFlexible(text, 'bioId');
+    //     if (bioIdValue && bioIdValue.includes('_')) {
+    //         const bioIdDeviceId = extractDeviceIdFromBioId(bioIdValue);
+    //         // Return a deviceId that's different from bioId's deviceId, or the same one if only one exists
+    //         const others = candidates.filter(c => c.toLowerCase() !== bioIdDeviceId?.toLowerCase());
+    //         if (others.length > 0) return others[0];
+    //         if (bioIdDeviceId) return bioIdDeviceId;
+    //     }
+
+    //     // No bioId found, return first 40-char hex
+    //     if (candidates.length > 0) return candidates[0];
+    // }
+
+    return null;
 }
 
 function findWrongFormatFields(text, correctFieldName) {
@@ -248,8 +318,9 @@ function validateTicket() {
     };
 
     // Step 1: Extract ONLY correct format fields (exact case match)
+    // Try flexible extraction if exact fails
     VALIDATION_RULES.required.forEach(field => {
-        const value = extractField(description, field);
+        const value = extractFieldFlexible(description, field);
         if (value) {
             result.extracted[field] = value;
         }
