@@ -735,16 +735,22 @@ function escapeHtml(text) {
 }
 
 function clearForm() {
-    document.getElementById('ticket-description').value = '';
-    document.getElementById('results').className = 'results-section';
-    document.getElementById('results').innerHTML = '';
+    const textarea = document.getElementById('ticket-description');
+    const results = document.getElementById('results');
+
+    textarea.value = '';
+    textarea.classList.height = 'auto';
+
+    results.className = 'results-section';
+    results.innerHTML = '';
 }
 
 // Auto-resize textarea
 const textarea = document.getElementById('ticket-description');
 textarea.addEventListener('input', function () {
     this.style.height = 'auto';
-    this.style.height = Math.max(200, this.scrollHeight) + 'px';
+    // this.style.height = Math.max(200, this.scrollHeight) + 'px';
+    this.style.height = this.scrollHeight + 'px';
 });
 
 // Add CSS animations for toast
