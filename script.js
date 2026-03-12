@@ -739,7 +739,12 @@ function clearForm() {
     const results = document.getElementById('results');
 
     textarea.value = '';
-    textarea.classList.height = 'auto';
+
+    // reset height
+    textarea.style.height = 'auto';
+
+    // reset scroll position
+    textarea.scrollTop = 0;
 
     results.className = 'results-section';
     results.innerHTML = '';
@@ -747,9 +752,9 @@ function clearForm() {
 
 // Auto-resize textarea
 const textarea = document.getElementById('ticket-description');
+
 textarea.addEventListener('input', function () {
     this.style.height = 'auto';
-    // this.style.height = Math.max(200, this.scrollHeight) + 'px';
     this.style.height = this.scrollHeight + 'px';
 });
 
